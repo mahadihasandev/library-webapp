@@ -11,7 +11,7 @@ export default function Page() {
         type='SIGN_UP'
         schema={signUpSchema}
         defaultValues={{
-          name:"",
+          fullName:"",
           email:"",
           password:"",
           universityId:0,
