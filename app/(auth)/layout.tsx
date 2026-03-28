@@ -30,8 +30,8 @@ export default async function layout({children}:{children:ReactNode}) {
                         <IoBookOutline className="text-white text-5xl"/>
                         <h1 className='text-2xl font-semibold text-white'>BookWorm</h1>
                     </div>
-                    <div>
-                      <h3>email: admin@gmail.com <br /> password: admin123</h3>
+                    <div className='space-y-4'>
+                      <h3 className='rounded-md border border-blue-400/30 bg-blue-500/10 p-3 text-sm text-blue-100'>Demo admin: admin@gmail.com | admin123</h3>
                         {children}
                     </div>
                     

@@ -9,7 +9,11 @@ import { redirect } from 'next/navigation'
 export default function page() {
   
   return (
-    <div>
+    <div className='space-y-8'>
+        <div>
+          <h1 className='text-3xl font-semibold text-white sm:text-4xl'>My Profile</h1>
+          <p className='mt-2 text-light-100'>Manage your account and review borrowed books.</p>
+        </div>
         <form action={async ()=>{
             'use server'
             await signOut()
@@ -17,9 +21,9 @@ export default function page() {
 
 
         }}
-        className='mb-10 '>
-          <div className='ml-[86%]'>
-            <Button className='px-10 py-6 bg-red-300 text-2xl font-ibm-plex-sans font-bold'>
+        className='mb-6'>
+          <div className='flex justify-start sm:justify-end'>
+            <Button className='w-full px-6 py-4 text-lg font-bold sm:w-auto sm:px-10 sm:py-6 sm:text-xl bg-red-300 font-ibm-plex-sans'>
                 Logout
             </Button>
             </div>

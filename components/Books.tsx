@@ -17,14 +17,14 @@ function Books() {
 
     return (
         <div className="flex flex-col items-center 
-        p-5 w-full mx-auto">
+        p-4 sm:p-6 w-full mx-auto">
             
-            <h1 className="text-4xl text-white md:text-6xl font-bold mb-8 text-center">
+            <h1 className="mb-6 text-center text-3xl font-bold text-white sm:mb-8 sm:text-5xl md:text-6xl">
                 {book.title}
             </h1>
 
             {/* Big Book Image */}
-            <div className="relative w-full mx-52 aspect-[2/3] max-w-md shadow-2xl rounded-lg overflow-hidden mb-8">
+            <div className="relative mb-8 aspect-[2/3] w-full max-w-[260px] overflow-hidden rounded-lg shadow-2xl sm:max-w-md">
                 <Image 
                     src={book.coverUrl} 
                     alt={book.title}
@@ -35,9 +35,9 @@ function Books() {
             </div>
 
             {/* Book Details */}
-            <div className="text-center space-y-4">
-                <p className="text-xl text-gray-100 italic">By {book.author}</p>
-                <p className="text-lg leading-relaxed text-light-300">
+            <div className="max-w-2xl space-y-4 text-center">
+                <p className="text-lg italic text-gray-100 sm:text-xl">By {book.author}</p>
+                <p className="text-base leading-relaxed text-light-300 sm:text-lg">
                     {book.description}
                 </p>
                 

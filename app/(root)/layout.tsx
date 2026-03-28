@@ -1,7 +1,6 @@
 
 import Header from '@/components/Header'
 import React, { ReactNode } from 'react'
-import { Toaster } from "@/components/ui/sonner"
 import { auth } from '@/nextauth'
 import { redirect } from 'next/navigation'
 import { after } from 'next/server'
@@ -44,13 +43,12 @@ export default async function layout({ children }: { children: ReactNode }) {
       backgroundSize: "40px 40px, 40px 40px, 100% 100%",
     }}
   />
-      <div className="root-container relative left-0 right-0 z-20">
+      <div className="root-container relative left-0 right-0 z-20 pb-8">
       <div className="mx-auto max-w-7xl">
         <Header session={session}/>
 
-        <div className="mt-20 pb-20 ">
+        <div className="mt-8 pb-12 sm:mt-12 sm:pb-16">
           {children}
-          <Toaster/>
           </div>
       </div>
   </div>

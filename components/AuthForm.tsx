@@ -1,12 +1,11 @@
 'use client'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DefaultValues, FieldValues, Path, SubmitHandler, useForm, UseFormReturn } from "react-hook-form"
-import { object, ZodType } from "zod"
+import { ZodType } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -47,15 +46,16 @@ const isSignIn=type==='SIGN_IN'
  
   // 2. Define a submit handler.
   const handleSubmit : SubmitHandler<T>=async (data) =>{  
-    const result =onSubmit(data)
-    if((await result).success){
+    const result = await onSubmit(data)
+    if(result.success){
         toast("Success",{
           description:isSignIn?"You are Logged in":"You Signed in"
         })
+         router.refresh()
          router.push("/")
     }else{
       toast(`Error ${isSignIn ? "signing in" : "signing up"}`,{
-          description: (await result).error,
+          description: result.error,
         
         })
     }  
@@ -94,7 +94,14 @@ const isSignIn=type==='SIGN_IN'
               </FormLabel>
               <FormControl>
                 {field.name=="universityCard"
-                ?(<ImageUpload onFileChange={field.onChange}/>)
+                ?(<ImageUpload
+                    onFileChange={field.onChange}
+                    type="image"
+                    accept="image/*"
+                    placeholder="Upload your university card"
+                    folder="users/university-cards"
+                    variant="dark"
+                  />)
                 :<Input 
                 required 
                 type={FIELD_TYPES[field.name as keyof typeof FIELD_TYPES]
@@ -110,14 +117,14 @@ const isSignIn=type==='SIGN_IN'
        
         ))}
        
-        <Button className="form-btn" type="submit">
+        <Button className="form-btn" type="submit" disabled={form.formState.isSubmitting}>
           {isSignIn?"Login":"Registration"}</Button>
       </form>
     </Form>
     <p className="text-center text-base font-medium pt-5">
-          {!isSignIn?"New to Bookworm ": "Already have an account? "}
-          <Link href={!isSignIn?"/signin":"/signup"} className="font-bold text-primary">
-              {!isSignIn?"Sign In":"Sign Up"}
+          {isSignIn?"New to Bookworm? ": "Already have an account? "}
+          <Link href={isSignIn?"/signup":"/signin"} className="font-bold text-primary">
+              {isSignIn?"Sign Up":"Sign In"}
           </Link>
     </p>
  </div>

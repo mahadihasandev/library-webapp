@@ -25,7 +25,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return {
               id:user[0].id.toString(),
               email:user[0].email,
-              fullName:user[0].fullName,
+              name:user[0].fullName,
             } as User
         }
     }),
@@ -39,7 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({token,user}){
       if(user){
         token.id=user.id
-        token.namee=user.name
+        token.name=user.name
       }
       return token
     },

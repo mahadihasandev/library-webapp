@@ -1,10 +1,10 @@
 import {z} from 'zod';
 
 export const signUpSchema=z.object({
-    fullName:z.string().min(3),
+    fullName:z.string().trim().min(3),
     email:z.email(),
     password:z.string().min(8),
-    universityId:z.coerce.number(),
+    universityId:z.coerce.number().int().positive("University ID must be greater than 0"),
     universityCard:z.string().nonempty("university Card is required"),
 })
 

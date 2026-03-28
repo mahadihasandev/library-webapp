@@ -9,11 +9,44 @@ import { headers } from "next/headers";
 import ratelimit from "../ratelimit";
 import { redirect } from "next/navigation";
 
+const getClientIp = async () => {
+  const requestHeaders = await headers();
+  const forwardedFor = requestHeaders.get("x-forwarded-for");
+  const realIp = requestHeaders.get("x-real-ip");
+
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim();
+  }
+
+  return realIp || "127.0.0.1";
+};
+
 export const signInWithCredentials = async (
   param: Pick<AuthCredentials, "email" | "password">,
+  options?: { skipRateLimit?: boolean },
 ) => {
-  const { email, password } = param;
-  const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
+  const email = param.email.trim().toLowerCase();
+  const { password } = param;
+
+  if (options?.skipRateLimit) {
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        return { success: false, error: "Wrong email or password" };
+      }
+
+      return { success: true };
+    } catch {
+      return { success: false, error: "Unable to sign in right now" };
+    }
+  }
+
+  const ip = await getClientIp();
   let success = true;
   try {
     const { success: limitSuccess } = await ratelimit.limit(ip);
@@ -30,18 +63,19 @@ export const signInWithCredentials = async (
       redirect: false,
     });
     if (result?.error) {
-      return { success: false, error: result.error };
+      return { success: false, error: "Wrong email or password" };
     }
     return { success: true };
-  } catch (error) {
-    return { success: false, error: `Signup Error ${error}` };
+  } catch {
+    return { success: false, error: "Unable to sign in right now" };
   }
 };
 
 export const signUp = async (params: AuthCredentials) => {
-  const { fullName, email, password, universityId, universityCard } = params;
+  const { fullName, password, universityId, universityCard } = params;
+  const email = params.email.trim().toLowerCase();
 
-  const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
+  const ip = await getClientIp();
   let success = true;
   try {
     const { success: limitSuccess } = await ratelimit.limit(ip);
@@ -59,7 +93,7 @@ export const signUp = async (params: AuthCredentials) => {
     .limit(1);
 
   if (existingUser.length > 0) {
-    return { success: false, error: "user already exist" };
+    return { success: false, error: "Email is already registered" };
   }
 
   const hashPassword = await hash(password, 10);
@@ -71,9 +105,17 @@ export const signUp = async (params: AuthCredentials) => {
       universityId,
       universityCard,
     });
-    await signInWithCredentials({ email, password });
+    const signInResult = await signInWithCredentials(
+      { email, password },
+      { skipRateLimit: true },
+    );
+
+    if (!signInResult.success) {
+      return signInResult;
+    }
+
     return { success: true };
-  } catch (error) {
-    return { success: false, error: `Wrong username or Password ${error}` };
+  } catch {
+    return { success: false, error: "Unable to create account right now" };
   }
 };

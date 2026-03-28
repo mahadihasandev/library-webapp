@@ -6,13 +6,6 @@ import { useRef, useState } from "react"
 import { CloudSync } from "lucide-react"
 import { toast } from "sonner"
 
-const {env
-        :{imagekit
-            :{publicKey,
-            urlEndpoint}
-        }
-    }=config
-
 const authenticator =async ()=>{
   try {
     const response=await fetch(`${config.env.apiEndpoint}/api/auth/imagekit`)
@@ -41,21 +34,33 @@ folder:string
 variant:'dark'|'light'
 }
 
+interface UploadSuccessResponse {
+  filePath: string
+}
+
 export default function FileUpload({
   onFileChange,type,accept,placeholder,folder,variant}:Props) {
 
-    const onSuccess=(res:any)=>{
+    const onSuccess=(res: unknown)=>{
+    if (!res || typeof res !== "object" || !("filePath" in res)) {
+      toast.error("Upload failed", {
+        description: "Unexpected upload response",
+      })
+      return
+    }
+
+    const uploadResponse = res as UploadSuccessResponse
       
-    setFile(res)
-    onFileChange(res.filePath)
+    setFile(uploadResponse)
+    onFileChange(uploadResponse.filePath)
     toast.success("Image uploaded Successfully",{     
-      description:`${res.filePath} uploaded successfully`
+      description:`${uploadResponse.filePath} uploaded successfully`
     })
   }
 
-  const ikUploadRef=useRef(null)
+  const ikUploadRef=useRef<{ click: () => void } | null>(null)
   const [file,setFile]=useState<{filePath:string}|null>(null)
-  const onError=(error:unknown)=>{
+  const onError=()=>{
     toast.error("Image uploaded field",{     
       description:`Image can't be uploaded`
     })
@@ -71,25 +76,26 @@ export default function FileUpload({
 
     >
       <IKUpload className='hidden' 
-        ref={ikUploadRef}
+        ref={(instance) => {
+          ikUploadRef.current = instance as { click: () => void } | null
+        }}
         onSuccess={onSuccess}
         onError={onError}
         fileName='test.png'
+        accept={accept}
+        folder={folder}
         
         />
 
       <button 
-      className="upload-btn border"
+      className={`upload-btn border ${variant === "dark" ? "bg-dark-300" : "bg-white"}`}
       onClick={(e)=>{
         e.preventDefault()
-        if(ikUploadRef.current){
-          //@ts-ignore
-          ikUploadRef.current?.click()
-        }
+        ikUploadRef.current?.click()
       }}
       >
         <CloudSync />
-        <p className="text-base text-light-100">Upload a file</p>
+        <p className="text-base text-light-100">{placeholder || `Upload ${type}`}</p>
         {file&&<p className="upload-filename">{file.filePath}</p>}
         </button>
         {file&&(
